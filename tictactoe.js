@@ -41,9 +41,15 @@ class TicTacToe {
     // query DOM for all squares that have the current player's marker as innerText
     const squares = Array.from(document.getElementsByClassName('square'));
     const currentPlayerSquares = squares.filter(square => square.innerText === this.currentPlayer);
-    const something = currentPlayerSquares.map(square => square.dataset.square);
+    const x = currentPlayerSquares.map(square => square.dataset.square);
     // create map of all data-square attributes as integers
     // if player has any winCombination, they've won
+
+    // rough idea for finding a win combination:
+    combos.find(combo => {
+      return combo.every(num => x.includes(num))
+    });
+
       // alert players who won
       // restart game
   }
