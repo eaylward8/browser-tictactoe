@@ -1,0 +1,13 @@
+body {
+  text-align: center;
+}
+
+.square {
+  border: 1px solid black;
+  display: inline-block;
+  /* font-size: 4em; */
+  /* padding: 40px; */
+  width: 40px;
+  height: 40px;
+  margin: 0;
+}
