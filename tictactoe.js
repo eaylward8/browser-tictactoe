@@ -1,17 +1,9 @@
 document.addEventListener("DOMContentLoaded", function() {
-  let game = new TicTacToe(10);
-  game.startGame();
+  new TicTacToe();
 });
 
-
-// handle switching turns
-// player 1 is x, player 2 is o
-// add event listeners to each square
-  // on click, check current player and insert x or o into dom
-
 class TicTacToe {
-  constructor(gridSize) {
-    // buuild grid on the DOM
+  constructor() {
     this.currentPlayer = 'X';
     this.winCombinations = [
       [1, 2, 3],
@@ -23,6 +15,7 @@ class TicTacToe {
       [1, 5, 9],
       [3, 5, 7]
     ];
+    this.addClickListeners();
   }
 
   get currentPlayer() {
@@ -33,40 +26,54 @@ class TicTacToe {
     this._currentPlayer = player;
   }
 
-  startGame() {
-    this.addClickListeners();
+  get squares() {
+    return Array.from(document.getElementsByClassName('square'));
   }
 
-  isGameOver() {
-    // query DOM for all squares that have the current player's marker as innerText
-    const squares = Array.from(document.getElementsByClassName('square'));
-    const currentPlayerSquares = squares.filter(square => square.innerText === this.currentPlayer);
-    const x = currentPlayerSquares.map(square => square.dataset.square);
-    // create map of all data-square attributes as integers
-    // if player has any winCombination, they've won
-
-    // rough idea for finding a win combination:
-    combos.find(combo => {
-      return combo.every(num => x.includes(num))
-    });
-
-      // alert players who won
-      // restart game
+  get currentPlayerSquares() {
+    return this.squares.filter(square => square.innerText === this.currentPlayer)
+                       .map(square => parseInt(square.dataset.squareNum));
   }
 
   handleMove(square) {
     square.innerText = this.currentPlayer;
-    this.isGameOver();
-    this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X'
+
+    if (this.winAchieved()) {
+      this.alertAndResetGame(`Player ${this.currentPlayer} wins!`);
+    } else if (this.isDraw()) {
+      this.alertAndResetGame("It's a draw!");
+    } else {
+      this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X'
+    }
+  }
+
+  async alertAndResetGame(message) {
+    await new Promise(resolve => setTimeout(resolve, 200)); // slight pause to allow DOM to update
+    alert(message);
+    this.resetGame();
+  }
+
+  winAchieved() {
+    return this.winCombinations.find(combination => {
+      return combination.every(num => this.currentPlayerSquares.includes(num))
+    });
+  }
+
+  isDraw() {
+    return this.squares.every(square => square.innerText);
+  }
+
+  resetGame() {
+    this.currentPlayer = 'X';
+    this.squares.forEach(square => square.innerText = '');
   }
 
   addClickListeners() {
-    // select all squares from page and add listeners
-    const squares = Array.from(document.getElementsByClassName('square'));
-    squares.forEach(square => {
+    this.squares.forEach(square => {
       square.addEventListener('click', (event) => {
         const square = event.target;
-        this.handleMove(square);
+        // handle move only if square is empty
+        if (!square.innerText) this.handleMove(square);
       })
     })
   }
